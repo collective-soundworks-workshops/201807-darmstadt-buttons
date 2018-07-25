@@ -5,6 +5,7 @@ const client = soundworks.client;
 
 const template = `
   <div id="upper" class="field"></div>
+  <div id="middle" class="field"></div>
   <div id="lower" class="field"></div>
 `;
 
@@ -23,6 +24,7 @@ export default class PlayerExperience extends soundworks.Experience {
     this.onPlay = this.onPlay.bind(this);
     this.onText = this.onText.bind(this);
     this.onTouchStart = this.onTouchStart.bind(this);
+    this.onTouchEnd = this.onTouchEnd.bind(this);
   }
 
   start() {
@@ -34,8 +36,9 @@ export default class PlayerExperience extends soundworks.Experience {
     this.receive('play', this.onPlay);
     this.receive('text', this.onText);
 
-    this.surface = new soundworks.TouchSurface(this.view.$el);
+    this.surface = new soundworks.TouchSurface(this.view.$el, { normalizeCoordinates: false });
     this.surface.addListener('touchstart', this.onTouchStart);
+    this.surface.addListener('touchend', this.onTouchEnd);
   }
 
   playSound(buffer, speed = 1) {
@@ -55,14 +58,30 @@ export default class PlayerExperience extends soundworks.Experience {
     }
   }
 
-  onText(selector, text) {
-    const element = document.querySelector(selector);
+  onText(id, text) {
+    const element = document.getElementById(id);
 
     if (element)
       element.innerHTML = text;
   }
 
-  onTouchStart(id, normX, normY, touch, touchEvent) {
-    this.send('bang', (normY < 0.5));
+  onTouchStart(id, x, y, touch, touchEvent) {
+    const target = document.elementFromPoint(x, y);
+    let targetId = 'none';
+
+    if (target)
+      targetId = target.id;
+
+    this.send('push', targetId, 1, x, y);
+  }
+
+  onTouchEnd(id, x, y, touch, touchEvent) {
+    const target = document.elementFromPoint(x, y);
+    let targetId = 'none';
+
+    if (target)
+      targetId = target.id;
+
+    this.send('push', targetId, 0, x, y);
   }
 }

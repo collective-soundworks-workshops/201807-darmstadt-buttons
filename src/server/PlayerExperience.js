@@ -37,7 +37,7 @@ export default class PlayerExperience extends Experience {
   enter(client) {
     super.enter(client);
 
-    this.receive(client, 'bang', this.getOnBangForClient(client));
+    this.receive(client, 'push', this.getOnPushForClient(client));
     this.params.update('numPlayers', this.clients.length);
   }
 
@@ -46,9 +46,9 @@ export default class PlayerExperience extends Experience {
     this.params.update('numPlayers', this.clients.length);
   }
 
-  getOnBangForClient(client) {
-    return (flag) => {
-      this.osc.send('/button', [client.index, flag]);
+  getOnPushForClient(client) {
+    return (id, x, y) => {
+      this.osc.send('/buttons/push', [client.index, id, x, y]);
     };
   }
 }
