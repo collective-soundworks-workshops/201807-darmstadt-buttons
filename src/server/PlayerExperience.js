@@ -47,8 +47,8 @@ export default class PlayerExperience extends Experience {
   }
 
   getOnPushForClient(client) {
-    return (id, x, y) => {
-      this.osc.send('/buttons/push', [client.index, id, x, y]);
+    return (id, state, x, y) => {
+      this.osc.send('/buttons/push', [client.index, id, state, x, y]);
     };
   }
 }
